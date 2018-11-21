@@ -165,12 +165,10 @@ sister(Person, Sibling) :-
 	female(Person).
 
 aunt(Person, NieceNephew) :-
-	parent(X, NieceNephew),	sister(Person, X) ; 
-	uncle(Y, NieceNephew), wife(Person, Y).
+	parent(X, NieceNephew),	sister(Person, X).
 
 uncle(Person, NieceNephew) :-
-	parent(X, NieceNephew),	brother(Person, X):
-	aunt(Y, NieceNephew), husband(Person, Y).
+	parent(X, NieceNephew),	brother(Person, X).
 
 niece(Person, AuntUncle) :-
 	aunt(AuntUncle, Person),
