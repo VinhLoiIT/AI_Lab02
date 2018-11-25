@@ -99,81 +99,42 @@ parent('Zara Phillips', 'Mia Grace Tindall').
 parent('Mike Tindall', 'Mia Grace Tindall').
 
 % rules
-husband(Person, Wife) :-
-	married(Person, Wife),
-	married(Wife, Person),
-	male(Person).
+husband(Person, Wife) :- married(Person, Wife), married(Wife, Person), male(Person).
 	
-wife(Person, Husband) :-
-	married(Person, Husband),
-	married(Husband, Person),
-	female(Person).
+wife(Person, Husband) :- married(Person, Husband), married(Husband, Person), female(Person).
 	
-father(Parent, Child) :-
-	parent(Parent, Child),
-	male(Parent).
+father(Parent, Child) :- parent(Parent, Child), male(Parent).
+
+mother(Parent, Child) :- parent(Parent, Child), female(Parent).
+
+child(Child, Parent) :- parent(Parent, Child).
 	
-mother(Parent, Child) :-
-	parent(Parent, Child),
-	female(Parent).
+son(Child, Parent) :- child(Child, Parent), male(Child).
 	
-child(Child, Parent) :-
-	parent(Parent, Child).
-	
-son(Child, Parent) :-
-	child(Child, Parent),
-	male(Child).
-	
-daughter(Child, Parent) :-
-	child(Child, Parent),
-	female(Child).
+daughter(Child, Parent) :- child(Child, Parent), female(Child).
 
+grandparent(GP, GC) :- parent(GP, X), parent(X, GC).
 
-grandparent(GP, GC) :-
-	parent(GP, X),
-	parent(X, GC).
+grandmother(GM, GC) :- grandparent(GM, GC), female(GM).
 
-grandmother(GM, GC) :-
-	grandparent(GM, GC),
-	female(GM).
+grandfather(GF, GC) :- grandparent(GF, GC), male(GF).
 
-grandfather(GF, GC) :-
-	grandparent(GF, GC),
-	male(GF).
+grandchild(GC, GP) :- grandparent(GP, GC).
 
-grandchild(GC, GP) :-
-	grandparent(GP, GC).
+grandson(GS, GP) :- grandchild(GS, GP), male(GS).
 
-grandson(GS, GP) :-
-	grandchild(GS, GP),
-	male(GS).
+granddaughter(GD, GP) :- grandchild(GD, GP), female(GD).
 
-granddaughter(GD, GP) :-
-	grandchild(GD, GP),
-	female(GD).
+sibling(Person1, Person2) :- parent(X, Person1), parent(X, Person2).
 
-sibling(Person1, Person2) :-
-	parent(X, Person1),
-	parent(X, Person2).
+brother(Person, Sibling) :- sibling(Person, Sibling), male(Person).
 
-brother(Person, Sibling) :-
-	sibling(Person, Sibling),
-	male(Person).
+sister(Person, Sibling) :- sibling(Person, Sibling), female(Person).
 
-sister(Person, Sibling) :-
-	sibling(Person, Sibling),
-	female(Person).
+aunt(Person, NieceNephew) :- parent(X, NieceNephew), sister(Person, X).
 
-aunt(Person, NieceNephew) :-
-	parent(X, NieceNephew),	sister(Person, X).
+uncle(Person, NieceNephew) :- parent(X, NieceNephew), brother(Person, X).
 
-uncle(Person, NieceNephew) :-
-	parent(X, NieceNephew),	brother(Person, X).
+niece(Person, AuntUncle) :- aunt(AuntUncle, Person), female(Person).
 
-niece(Person, AuntUncle) :-
-	aunt(AuntUncle, Person),
-	female(Person).
-
-nephew(Person, AuntUncle) :-
-	uncle(AuntUncle, Person),
-	male(Person).
+nephew(Person, AuntUncle) :- uncle(AuntUncle, Person), male(Person).
