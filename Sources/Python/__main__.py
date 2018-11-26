@@ -28,9 +28,3 @@ while True:
     
     except Exception as e:
         print("Invalid query: {}".format(e))
-
-# a = ['asdf', '12312']
-# b = ['asd', '12312']
-# print(a)
-# print(b)
-# print(str(a == b))

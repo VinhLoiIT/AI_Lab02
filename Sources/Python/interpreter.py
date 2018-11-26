@@ -11,6 +11,10 @@ class Functor:
     def is_fact(self):
         return self._is_constant()
 
+    def clone(self):
+        args = list(self.args)
+        return Functor(self.name, args)
+
     def get_var_pos(self):
         for i in range(len(self.args)):
             if isinstance(self.args[i], Variable):
@@ -21,9 +25,7 @@ class Functor:
         for arg in self.args:
             if not isinstance(arg, Atom):
                 return False
-        return True
-
-        
+        return True     
     
     def __str__(self):
         return '{}/{}'.format(self.name, self.arity)
@@ -33,10 +35,21 @@ class Rule:
     def __init__(self, head: Functor, body):
         self.name = head.name
         self.arity = head.arity
+        self.head = head
         self.body = body
 
     def __str__(self):
-        return '{}/{} :- {}'.format(self.name, self.arity, self.body)
+        return '{}/{}'.format(self.name, self.arity)
+
+    def clone(self):
+        head = self.head.clone()
+        body = []
+        for x in self.body:
+            if isinstance(x, Functor):
+                body.append(x.clone())
+            else:
+                body.append(x)
+        return Rule(head, body)
 
 class Atom(str):
     def __init__(self, value):
@@ -44,6 +57,9 @@ class Atom(str):
 
     def __str__(self):
         return str(self.value)
+    
+    def clone(self):
+        return Atom(self.value)
 
 class Variable(str):
     def __init__(self, value):
@@ -66,7 +82,7 @@ class Operator(str):
         return str(self) == ';'
 
 def parse_rule_action(tokens):
-    return Rule(tokens[0], tokens[1])
+    return Rule(tokens[0], tokens[1].asList())
 
 def parse_functor_action(tokens):
     return Functor(tokens[0], tokens[2].asList())
