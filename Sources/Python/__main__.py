@@ -15,6 +15,12 @@ def setup(filepath, ask_method):
     return kb
 
 def query(kb, sentence):
+    if kb.ask == fol_bc_ask:
+        query_bc(kb, sentence)
+    else:
+        query_fc(kb, sentence)
+
+def query_fc(kb,sentence):
     try:
         query_ask = ip.parse(sentence)
         answer_generator = kb.ask(kb, query_ask) 
@@ -38,35 +44,52 @@ def query(kb, sentence):
     except Exception as e:
         print("Invalid query: {}".format(e))
 
+def query_bc(kb, sentence):
+    try:
+        query_ask = ip.parse(sentence)
+        answer = kb.ask(kb, query_ask) 
+        if answer is not None:
+            if answer[0] != {}:
+                print(answer)
+            print("true.")
+        else:
+            print("false.")
+    except Exception as e:
+        print("Invalid query: {}".format(e))
+
 def console(kb):
     while True:
         sentence = input('prolog> ')
         query(kb, sentence)
 
-if __name__ == '__main__':
-    # console('1612348_1612756_Lab02.pl', fol_bc_ask)
+# if __name__ == '__main__':
+#     argparser = args.ArgumentParser('Prolog Python')
+#     argparser.add_argument('-f', '--file', help='Knowledge base file path', type=str, dest='filepath')
+#     argparser.add_argument('-m', '--method', help='Inference method', choices=['fc','bc'], required=True, dest='method')
+#     args = argparser.parse_args()
 
-    # l = [
-    #     "husband(X,'Princess Anna').",
-    #     "husband(X,Y).",
-    #     "husband('Timothy Laurence','Princess Anna').",
-    #     "husband('Timothy Laurence','Princess Anna')."
-    # ]
-    # for q in l:
-    #     query(kb, q)
+#     print(args)
 
-    argparser = args.ArgumentParser('Prolog Python')
-    argparser.add_argument('-f', '--file', help='Knowledge base file path', type=str, dest='filepath')
-    argparser.add_argument('-m', '--method', help='Inference method', choices=['fc','bc'], required=True, dest='method')
-    args = argparser.parse_args()
+#     if args.method == 'fc':
+#         method = fol_fc_ask
+#     else:
+#         method = fol_bc_ask
 
-    print(args)
+#     kb = setup(args.filepath, method)
+#     console(kb)
 
-    if args.method == 'fc':
-        method = fol_fc_ask
-    else:
-        method = fol_bc_ask
+def test():
+        
+    kb = setup('1612348_1612756_Lab02.pl', fol_bc_ask)
 
-    kb = setup(args.filepath, method)
-    console(kb)
+    l = [
+        "brother('Prince Charles','Prince Andrew').",
+        "brother(X,Y).",
+        "husband('Timothy Laurence','Princess Anne').",
+        "husband('Timothy Laurence','Princess Anne')."
+    ]
+    for q in l:
+        query(kb, q)
+        input('Next query....')
 
+test()

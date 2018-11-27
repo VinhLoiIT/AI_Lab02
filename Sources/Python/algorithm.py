@@ -63,15 +63,6 @@ def apply_bindings_seq(seq, bindings):
             l.append(x)
     return list(l)
 
-# def test_unify():
-#     term1 = Functor('f', [Variable('X')])
-#     term2 = Functor('f', [Atom('y')])
-#     theta = unify(term1, term2)
-#     print(theta)
-
-# test_unify()
-
-
 def calc_term(kb, term1, operator, term2):
     if isinstance(term1, Functor):
         term1 = kb.query_constant(term1)
@@ -198,7 +189,6 @@ def fol_fc_ask(kb: KnowledgeBase, query: Functor):
                 yield theta
 
         if str(rule) == str(query):
-            # no more
             break
 
     return None
@@ -210,7 +200,7 @@ def fol_bc_ask(kb: KnowledgeBase, query: Functor):
         for args in kb._fact[str(query)]:
             theta = unify(args, query.args)
             if theta is not None:
-                yield theta
+                return theta
         return None
 
     kb = kb.clone()
@@ -236,12 +226,12 @@ def fol_bc_ask(kb: KnowledgeBase, query: Functor):
     tried_subst = []
     find_match(kb, kb._rules[str(query)].body, subst_list, tried_subst, current_subst, 0, result)
 
-    for x in result:
-        # yield unify(query, query.apply_bindings(x))
-        yield x
-    return None
-
-    
-# def test_fol_bc_ask():
-#     for answer in fol_bc_ask([parent(Z, 'john')], {}): 
-#         print("Answer: " + str(answer))
+    for i in range(len(result)):
+        x = result[i]
+        replace_goal = kb._rules[str(query)].head.apply_bindings(x)
+        x = unify(replace_goal, query.apply_bindings(x))
+        result[i] = x
+        
+    if result == []:
+        return None
+    return result
