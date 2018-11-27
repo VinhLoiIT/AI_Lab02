@@ -55,4 +55,5 @@ uncle(X,'Prince William').
 19. Ai là cháu gái của Princess Anne?
 niece(X,'Princess Anne').
 
-20. Prince William có phải cháu trai của Princess Anne không?
+20. Ai là cháu trai của Prince Harry?
+nephew(X,'Prince Harry').
