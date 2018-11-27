@@ -66,6 +66,8 @@ eat('Wolf','Eagle').
 
 eat('Python','Eagle').
 
+beEaten(X,Y):- eat(Y,X).
+
 %Loai dong vat an thuc vat
 eatPlants(Y):- eat(X,Y), classification(X,'Plants').
 
