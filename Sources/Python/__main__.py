@@ -23,8 +23,9 @@ while True:
             while True:
                 answer = next(answer_generator)
                 if answer is not None:
-                    if len(answer) == 1 and answer[0] == {}:
-                        print(True)
+                    if len(answer.keys()) == 0:
+                        print("true.")
+                        break
                     else:
                         print(answer)
                         if input('Enter ; to continue: ') != ';':

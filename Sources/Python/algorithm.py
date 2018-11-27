@@ -165,8 +165,12 @@ def find_match(kb:KnowledgeBase, rule_body, subst_list: list, tried_subst:list, 
 
 def fol_fc_ask(kb: KnowledgeBase, query: Functor):
     'Suy dien tien'
-    assert str(query) in kb._rules.keys()
-
+    if str(query) in kb._fact.keys():
+        for args in kb._fact[str(query)]:
+            theta = unify(args, query.args)
+            if theta is not None:
+                yield theta
+        return None
     kb = kb.clone()
 
     for rule_name in kb._rules.keys():
@@ -199,29 +203,23 @@ def fol_fc_ask(kb: KnowledgeBase, query: Functor):
 
     return None
 
-# def fol_bc_ask(goals, substitutions):
-#     """
-#     Attempts to satisfy a given set of goals, if one or more of the goals contains unbound variables,
-#     this algorithm will find every binding for every variable so that the goals are satisfied. The 
-#     solutions are given as a sequence of variable mappings that satisfy the goals. If there is no 
-#     mapping that will satisfy the goals then the generator yields no results.
-#     """
-#     if len(goals) == 0:
-#         yield substitutions
-#         return
-#     goal = goals[0].apply_bindings(substitutions)
-#     for mgu,new_goals,variables in goal.predicate._resolve(goal.terms):
-#         for child_answers in fol_bc_ask(new_goals + goals[1:], compose(substitutions, mgu)):
-#             if child_answers == None: 
-#                 yield None
-#                 return
-#         for var in variables:
-#             try: 
-#                 del child_answers[var]
-#             except: pass
-#         yield child_answers
-#     if goal.predicate == cut:
-#         yield None
+def fol_bc_ask(kb, goals, theta):
+    # goals = [query]
+    if len(goals) == 0:
+        yield theta
+
+    goal = goals[0].apply_bindings(theta)
+
+    for mgu,new_goals,variables in goal.predicate._resolve(goal.terms):
+        for child_answers in fol_bc_ask(kb, new_goals + goals[1:], compose(theta, mgu)):
+            if child_answers == None: 
+                return None
+        for var in variables:
+            try: 
+                del child_answers[var]
+            except: pass
+        yield child_answers
+    return False
 
 # def test_fol_bc_ask():
 #     for answer in fol_bc_ask([parent(Z, 'john')], {}): 
