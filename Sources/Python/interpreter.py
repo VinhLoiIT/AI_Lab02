@@ -1,8 +1,12 @@
 import pyparsing as pp
 import string
 
+class Term:
+        
+    def apply_bindings(self, bindings):
+        return self
 
-class Functor:
+class Functor(Term):
     def __init__(self, name, args):
         self.name = name
         self.args = args
@@ -30,43 +34,88 @@ class Functor:
     def __str__(self):
         return '{}/{}'.format(self.name, self.arity)
 
+    def apply_bindings(self, bindings):
+        new_terms = []
+        for term in self.args:
+            if isinstance(term, Term): 
+                new_terms.append(term.apply_bindings(bindings))
+            else: 
+                new_terms.append(term)
+        return Functor(self.name, new_terms)
 
-class Rule:
-    def __init__(self, head: Functor, body):
-        self.name = head.name
-        self.arity = head.arity
-        self.head = head
-        self.body = body
 
-    def __str__(self):
-        return '{}/{}'.format(self.name, self.arity)
-
-    def clone(self):
-        head = self.head.clone()
-        body = []
-        for x in self.body:
-            if isinstance(x, Functor):
-                body.append(x.clone())
-            else:
-                body.append(x)
-        return Rule(head, body)
-
-class Atom(str):
+class Atom(Term):
     def __init__(self, value):
         self.value = value
+        self._hash = hash(self.value)
 
     def __str__(self):
         return str(self.value)
     
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return self._hash
+
+    def __eq__(self, other):
+        return isinstance(other, Atom) and self.value == other.value
+
+    def apply_bindings(self, bindings):
+        if str(self) in bindings.keys():
+            return bindings[self]
+        else:
+            return self
+    
     def clone(self):
         return Atom(self.value)
 
-class Variable(str):
+class Variable(Term):
     def __init__(self, value):
         self.value = value
+        self._hash_value = hash(self.value)
+
+    def __hash__(self):
+        return self._hash_value    
 
     def __str__(self):
         return str(self.value)
+
+    def __eq__(self, other):
+        return isinstance(other, Variable) and self.value == other.value
+
+    def __repr__(self):
+        return str(self)
+
+    def apply_bindings(self, bindings: dict):
+        if self in bindings:
+            return bindings[self]
+        else: 
+            return self
+
+
+class Rule:
+    def __init__(self, head: Functor, body: list):
+        self.name = head.name
+        self.arity = head.arity
+        self.head = head
+        if body == None:
+            self.body = []
+        else:
+            self.body = body
+
+    def clone(self):
+        new_body = []
+        for x in self.body:
+            if isinstance(x, Term):
+                new_body.append(x.clone())
+            else:
+                new_body.append(x)
+        return Rule(self.head.clone(), new_body)
+
+    def __str__(self):
+        return '{}/{}'.format(self.name, self.arity)
+
 
 class Operator(str):
     def __init__(self, value):
