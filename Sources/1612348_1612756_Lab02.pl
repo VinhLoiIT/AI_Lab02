@@ -10,7 +10,7 @@ male('Prince Harry').
 male('Peter Phillips').
 male('Mike Tindall').
 male('James Viscount Severn').
-male('Prince Geogre').
+male('Prince George').
 
 female('Queen Elizabeth II').
 female('Princess Diana').
@@ -85,9 +85,9 @@ parent('Prince Edward', 'James Viscount Severn').
 parent('Prince Edward', 'Lady Louise Mountbatten Windsor').
 
 % row 2 and 3
-parent('Prince William', 'Prince Geogre').
+parent('Prince William', 'Prince George').
 parent('Prince William', 'Princess Charlotte').
-parent('Kate Middleton', 'Prince Geogre').
+parent('Kate Middleton', 'Prince George').
 parent('Kate Middleton', 'Princess Charlotte').
 
 parent('Autumn Kelly', 'Savannah Phillips').
@@ -100,17 +100,17 @@ parent('Mike Tindall', 'Mia Grace Tindall').
 
 % rules
 husband(Person, Wife) :- married(Person, Wife), married(Wife, Person), male(Person).
-	
+
 wife(Person, Husband) :- married(Person, Husband), married(Husband, Person), female(Person).
-	
+
 father(Parent, Child) :- parent(Parent, Child), male(Parent).
 
 mother(Parent, Child) :- parent(Parent, Child), female(Parent).
 
 child(Child, Parent) :- parent(Parent, Child).
-	
+
 son(Child, Parent) :- child(Child, Parent), male(Child).
-	
+
 daughter(Child, Parent) :- child(Child, Parent), female(Child).
 
 grandparent(GP, GC) :- parent(GP, X), parent(X, GC).

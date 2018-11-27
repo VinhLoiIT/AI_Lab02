@@ -1,4 +1,4 @@
-1. Ai là chồng của Autumn Kelly?
+﻿1. Ai là chồng của Autumn Kelly?
 husband(X, 'Autumn Kelly').
 
 2. Princess Anne có phải là vợ của Captain Mark Phillips không?
@@ -28,3 +28,31 @@ grandmother(X, 'Savannah Phillips').
 10. Timothy Laurence có phải là ông nội của Mia Grace Tindall?
 grandfather('Timothy Laurence', 'Mia Grace Tindall').
 
+11. Princess Charlotte có phải cháu của Prince Charles không?
+grandchild('Princess Charlotte','Prince Charles').
+
+12. Prince George có phải là cháu trai của Prince Charles không?
+grandson('Prince George','Prince Charles').
+
+13. Savannah Phillips có phải là cháu gái của Princess Anne không?
+granddaughterr('Savannah Phillips','Princess Anne').
+
+14. Princess Anne có phải là anh em ruột với Prince Charles không?
+sibling('Prince Charles','Princess Anne')
+
+15. Ai là anh/em trai với Prince Harry
+brother(X,'Prince Harry').
+
+16. Savannah Phillips có phải là chị/em gái với Isla Phillips không?
+sister('Savannah Phillips','Isla Phillips')
+
+17. Zara Phillips có phải là cô của Isla Phillips không?
+aunt('Zara Phillips','Isla Phillips').
+
+18. Ai là uncle của Prince William?
+uncle(X,'Prince William').
+
+19. Ai là cháu gái của Princess Anne?
+niece(X,'Princess Anne').
+
+20. Prince William có phải cháu trai của Princess Anne không?
