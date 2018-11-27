@@ -1,0 +1,62 @@
+﻿1. Chim ưng (Eagle) có ăn ếch (Frog) không?
+eat('Frog','Eagle').
+
+2. Python có ăn Chicken không?
+eat('Python','Chicken').
+
+3. Những loài động vật nào thuộc lớp Birds?
+classification(X,'Birds').
+
+4. Rat có thuộc lớp Mammals không?
+classification('Rat','Mammals').
+
+5. Loài động vật nào ăn thực vật?
+eatPlants(X).
+
+5. Fox có ăn thực vật không?
+eatPlants('Fox').
+
+6. Lớp động vật nào mà có ít nhất 1 loài ăn thực vật?
+classAnimalsEatPlants(X).
+
+7. Loài động vật nào không ăn thực vật?
+eatAnimals(X).
+
+8. Lớp động vật nào mà trong đó có ít nhất 1 loài không ăn thực vật?
+classAnimalsEatAnimals(X).
+
+9. Loài động vật nào ăn tạp?
+omnivorous(X).
+
+10. Coyote có ăn tạp không?
+omnivorous('Coyote').
+
+11. Lớp động vật nào mà trong đó có ít nhất 1 loài ăn tạp?
+classAnimalsCmnivorous(X).
+
+12. Loài nào ăn côn trùng?
+eatClass('Insects',X).
+
+13. Loài nào CHỈ ăn thực vật?
+eatOnlyPlants(X).
+
+14. Lớp động vật nào chỉ ăn thực vật?
+classEatOnlyPlants(X).
+
+15. Loài động vật nào không có kẻ thù khác loài?
+suzerain(X).
+
+16. Grass thuộc lớp nào?
+classification('Grass',X).
+
+17. Lớp Birds có ít nhất 1 loài CHỈ ăn thực vật đúng không?
+classEatOnlyPlants('Birds').
+
+18. Lớp Mammals có ít nhất 1 loài ăn tạp đúng không?
+ classAnimalsCmnivorous('Mammals').
+
+19. Python có phải là loài không có kẻ thù (không bị ăn thịt) đúng không?
+suzerain('Python').
+
+20. Lớp Birds có ít nhất 1 loài ăn thực vật đúng không?
+classAnimalsEatPlants('Birds').
