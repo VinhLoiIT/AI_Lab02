@@ -2,9 +2,10 @@ import interpreter as ip
 
 class KnowledgeBase(object):
 
-    def __init__(self):
+    def __init__(self, ask_method):
         self._fact = {}
         self._rules = {}
+        self.ask = ask_method
 
     def create(self, filepath):
         f = open(filepath, 'r')
@@ -30,7 +31,7 @@ class KnowledgeBase(object):
                 raise KBError("Unknow parsed")
 
     def clone(self):
-        kb = KnowledgeBase()
+        kb = KnowledgeBase(self.ask)
         for key in self._fact.keys():
             kb._fact[key] = [list(x) for x in self._fact[key]]
         for key in self._rules.keys():
@@ -62,8 +63,7 @@ class KnowledgeBase(object):
             else:
                 return True
         elif str(q) in self._rules.keys():
-            from algorithm import fol_fc_ask
-            return fol_fc_ask(self, q)
+            return self.ask(self, q)
         else:
             raise KBError()
                 
@@ -71,6 +71,8 @@ class KnowledgeBase(object):
         assert not self.is_constant(q)
         return self.instantiate(q)
 
+    def set_ask_method(self, method):
+        self.ask = method
 
     def is_constant(self, query):
         return isinstance(query, ip.Atom) or (isinstance(query, ip.Functor) and query.is_fact())
@@ -82,8 +84,7 @@ class KnowledgeBase(object):
             return self.answer
 
         elif str(functor) in self._rules.keys():
-            from algorithm import fol_fc_ask
-            return fol_fc_ask(self, functor)
+            return self.ask(self, functor)
         else:
             return False
 

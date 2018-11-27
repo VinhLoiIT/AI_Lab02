@@ -203,24 +203,45 @@ def fol_fc_ask(kb: KnowledgeBase, query: Functor):
 
     return None
 
-def fol_bc_ask(kb, goals, theta):
-    # goals = [query]
-    if len(goals) == 0:
-        yield theta
 
-    goal = goals[0].apply_bindings(theta)
+def fol_bc_ask(kb: KnowledgeBase, query: Functor):
 
-    for mgu,new_goals,variables in goal.predicate._resolve(goal.terms):
-        for child_answers in fol_bc_ask(kb, new_goals + goals[1:], compose(theta, mgu)):
-            if child_answers == None: 
-                return None
-        for var in variables:
-            try: 
-                del child_answers[var]
-            except: pass
-        yield child_answers
-    return False
+    if str(query) in kb._fact.keys():
+        for args in kb._fact[str(query)]:
+            theta = unify(args, query.args)
+            if theta is not None:
+                yield theta
+        return None
 
+    kb = kb.clone()
+
+    bindings = unify(query, kb._rules[str(query)].head)
+    for key in list(bindings.keys()):
+        if isinstance(bindings[key], Variable):
+            del bindings[key]
+    if bindings is None:
+        bindings = {}
+
+    subst_list = []
+    for p in kb._rules[str(query)].body:
+        if isinstance(p, Functor):
+            p = p.apply_bindings(bindings)
+            theta = kb.instantiate(p)
+            subst_list.append(theta)
+        else:
+            subst_list.append(p)
+
+    result = []
+    current_subst = bindings
+    tried_subst = []
+    find_match(kb, kb._rules[str(query)].body, subst_list, tried_subst, current_subst, 0, result)
+
+    for x in result:
+        # yield unify(query, query.apply_bindings(x))
+        yield x
+    return None
+
+    
 # def test_fol_bc_ask():
 #     for answer in fol_bc_ask([parent(Z, 'john')], {}): 
 #         print("Answer: " + str(answer))
