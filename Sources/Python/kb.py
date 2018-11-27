@@ -4,8 +4,7 @@ class KnowledgeBase(object):
 
     def __init__(self):
         self._fact = {}
-        self._rules = []
-        self._unify_temp = {}
+        self._rules = {}
 
     def create(self, filepath):
         f = open(filepath, 'r')
@@ -30,7 +29,15 @@ class KnowledgeBase(object):
             else:
                 raise KBError("Unknow parsed")
 
-    def add_fact(self, fact): # or atom
+    def clone(self):
+        kb = KnowledgeBase()
+        for key in self._fact.keys():
+            kb._fact[key] = [list(x) for x in self._fact[key]]
+        for key in self._rules.keys():
+            kb.add_rule(self._rules[key].clone())
+        return kb
+
+    def add_fact(self, fact):
         if isinstance(fact, ip.Atom):
             self._fact[str(fact)] = True
         elif isinstance(fact, ip.Functor):
@@ -41,8 +48,8 @@ class KnowledgeBase(object):
         else:
             raise KBError("Invalid fact")
 
-    def add_rule(self, rule):
-        self._rules.append(rule)
+    def add_rule(self, rule: ip.Rule):
+        self._rules[str(rule)] = rule
 
     def query_constant(self, q):
         assert self.is_constant(q)
@@ -54,52 +61,61 @@ class KnowledgeBase(object):
                 return False
             else:
                 return True
+        elif str(q) in self._rules.keys():
+            from algorithm import fol_fc_ask
+            return fol_fc_ask(self, q)
+        else:
+            raise KBError()
                 
     def query_ask(self, q: ip.Functor):
         assert not self.is_constant(q)
-        return self._unify(q)
+        return self.instantiate(q)
+
 
     def is_constant(self, query):
         return isinstance(query, ip.Atom) or (isinstance(query, ip.Functor) and query.is_fact())
 
-    def _unify(self, functor: ip.Functor):
+    def instantiate(self, functor: ip.Functor):
         if str(functor) in self._fact.keys():
             self.answer = []
-            self._unify_fact(functor, dict())
+            self.instantiate_fact(functor, dict())
             return self.answer
 
-        # TODO: unify rule
+        elif str(functor) in self._rules.keys():
+            from algorithm import fol_fc_ask
+            return fol_fc_ask(self, functor)
+        else:
+            return False
 
         return False
 
     def _unify_rule(self, rule: ip.Rule):
         raise NotImplementedError()
 
-    def _unify_fact(self, functor: ip.Functor, theta):
+    def instantiate_fact(self, functor: ip.Functor, theta):
+        assert str(functor) in self._fact.keys()
+        
         contain_var, pos = functor.get_var_pos()
         if contain_var:
             for fact in self._fact[str(functor)]:
-                args = functor.args.copy()
-                args[pos] = fact[pos]
-                newfunctor = ip.Functor(functor.name, args)
-
-                theta[functor.args[pos]] = fact[pos]
-                
-                self._unify_fact(newfunctor, theta)
+                var = functor.args[pos]
+                new_functor = functor.apply_bindings({var: fact[pos]})
+                theta[var] = fact[pos]
+                self.instantiate_fact(new_functor, theta)
         else:
             if self.query_constant(functor):
                 self.answer.append(dict(theta))
-        
 
+    def and_fact(self, fact1, fact2):
+        assert self.is_constant(fact1) and self.is_constant(fact2)
+        return self.query_constant(fact1) and self.query_constant(fact2)
 
-    # def _unify_fact_kb(self, fact: ip.Functor):
-    #     pass
-
+    def or_fact(self, fact1, fact2):
+        assert self.is_constant(fact1) and self.is_constant(fact2)
+        return self.query_constant(fact1) or self.query_constant(fact2)
 
 class KBError(ValueError):
     pass
 
 class SyntaxError(KBError):
     pass
-
-

@@ -1,5 +1,6 @@
 import interpreter as ip
 from kb import KnowledgeBase
+from algorithm import fol_fc_ask
 
 kb = KnowledgeBase()
 
@@ -14,23 +15,26 @@ print('Import knowledge base from {} successfully'.format(filename))
 while True:
     try:
         query = input("query> ")
+
         query = ip.parse(query)
 
-        if kb.is_constant(query):
-            if kb.query_constant(query):
-                print("true")
-            else:
-                print("false")
-        else:
-            answer = kb.query_ask(query)
-            for item in answer:
-                print(item)
+        answer_generator = fol_fc_ask(kb, query)
+        try:
+            while True:
+                answer = next(answer_generator)
+                if answer is not None:
+                    if len(answer.keys()) == 0:
+                        print("true.")
+                        break
+                    else:
+                        print(answer)
+                        if input('Enter ; to continue: ') != ';':
+                            break   
+                else:
+                    print("false.")
+                
+        except StopIteration:
+            print("false.")
     
     except Exception as e:
         print("Invalid query: {}".format(e))
-
-# a = ['asdf', '12312']
-# b = ['asd', '12312']
-# print(a)
-# print(b)
-# print(str(a == b))

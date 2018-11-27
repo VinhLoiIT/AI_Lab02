@@ -1,8 +1,12 @@
 import pyparsing as pp
 import string
 
+class Term:
+        
+    def apply_bindings(self, bindings):
+        return self
 
-class Functor:
+class Functor(Term):
     def __init__(self, name, args):
         self.name = name
         self.args = args
@@ -10,6 +14,10 @@ class Functor:
 
     def is_fact(self):
         return self._is_constant()
+
+    def clone(self):
+        args = list(self.args)
+        return Functor(self.name, args)
 
     def get_var_pos(self):
         for i in range(len(self.args)):
@@ -21,36 +29,93 @@ class Functor:
         for arg in self.args:
             if not isinstance(arg, Atom):
                 return False
-        return True
-
-        
+        return True     
     
     def __str__(self):
         return '{}/{}'.format(self.name, self.arity)
 
+    def apply_bindings(self, bindings):
+        new_terms = []
+        for term in self.args:
+            if isinstance(term, Term): 
+                new_terms.append(term.apply_bindings(bindings))
+            else: 
+                new_terms.append(term)
+        return Functor(self.name, new_terms)
+
+
+class Atom(Term):
+    def __init__(self, value):
+        self.value = value
+        self._hash = hash(self.value)
+
+    def __str__(self):
+        return str(self.value)
+    
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return self._hash
+
+    def __eq__(self, other):
+        return isinstance(other, Atom) and self.value == other.value
+
+    def apply_bindings(self, bindings):
+        if str(self) in bindings.keys():
+            return bindings[self]
+        else:
+            return self
+    
+    def clone(self):
+        return Atom(self.value)
+
+class Variable(Term):
+    def __init__(self, value):
+        self.value = value
+        self._hash_value = hash(self.value)
+
+    def __hash__(self):
+        return self._hash_value    
+
+    def __str__(self):
+        return str(self.value)
+
+    def __eq__(self, other):
+        return isinstance(other, Variable) and self.value == other.value
+
+    def __repr__(self):
+        return str(self)
+
+    def apply_bindings(self, bindings: dict):
+        if self in bindings:
+            return bindings[self]
+        else: 
+            return self
+
 
 class Rule:
-    def __init__(self, head: Functor, body):
+    def __init__(self, head: Functor, body: list):
         self.name = head.name
         self.arity = head.arity
-        self.body = body
+        self.head = head
+        if body == None:
+            self.body = []
+        else:
+            self.body = body
+
+    def clone(self):
+        new_body = []
+        for x in self.body:
+            if isinstance(x, Term):
+                new_body.append(x.clone())
+            else:
+                new_body.append(x)
+        return Rule(self.head.clone(), new_body)
 
     def __str__(self):
-        return '{}/{} :- {}'.format(self.name, self.arity, self.body)
+        return '{}/{}'.format(self.name, self.arity)
 
-class Atom(str):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
-
-class Variable(str):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
 
 class Operator(str):
     def __init__(self, value):
@@ -66,7 +131,7 @@ class Operator(str):
         return str(self) == ';'
 
 def parse_rule_action(tokens):
-    return Rule(tokens[0], tokens[1])
+    return Rule(tokens[0], tokens[1].asList())
 
 def parse_functor_action(tokens):
     return Functor(tokens[0], tokens[2].asList())
